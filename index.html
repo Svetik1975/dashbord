@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд с основными финансовыми метриками | Портфолио кейса</title>
+    <style>
+        :root {
+            --bg-primary: #0a0b14;
+            --bg-secondary: #11131f;
+            --bg-card: #161825;
+            --bg-card-hover: #1c1f30;
+            --text-primary: #e8e9f0;
+            --text-secondary: #a0a4b8;
+            --text-muted: #6b6f85;
+            --accent-gold: #e2b04a;
+            --accent-gold-light: #f0d078;
+            --accent-blue: #5b7fff;
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #38bdf8;
+            --accent-green: #34d399;
+            --accent-rose: #f472b6;
+            --accent-orange: #fb923c;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --border-card: rgba(255, 255, 255, 0.08);
+            --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --shadow-card-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            --shadow-glow-gold: 0 0 40px rgba(226, 176, 74, 0.3), 0 0 80px rgba(226, 176, 74, 0.1);
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --font-display: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            --font-body: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-image:
+                radial-gradient(ellipse at 20% 10%, rgba(91, 127, 255, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 75% 60%, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 90%, rgba(226, 176, 74, 0.04) 0%, transparent 50%);
+        }
+
+        /* Декоративные фоновые элементы */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(91, 127, 255, 0.04) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatBg 20s ease-in-out infinite;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -150px;
+            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(226, 176, 74, 0.03) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatBg 25s ease-in-out infinite reverse;
+        }
+        @keyframes floatBg {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(40px, -30px) scale(1.08);
+            }
+            50% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+            75% {
+                transform: translate(30px, 10px) scale(1.04);
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            padding: 60px 0 20px;
+            text-align: center;
+            position: relative;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: rgba(226, 176, 74, 0.08);
+            border: 1px solid rgba(226, 176, 74, 0.2);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent-gold-light);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .hero-badge .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(226, 176, 74, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(226, 176, 74, 0);
+            }
+        }
+
+        /* Градиентный заголовок с эффектом прозрачности */
+        .gradient-heading-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 auto 10px;
+        }
+        .gradient-heading {
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg,
+                    #f0d078 0%,
+                    #e2b04a 15%,
+                    #f7e8b0 30%,
+                    #d4943a 45%,
+                    #f0d078 60%,
+                    #c8842e 75%,
+                    #f7e8b0 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            /* Эффект прозрачности — внутренняя часть текста показывает фон */
+            filter: drop-shadow(0 2px 8px rgba(226, 176, 74, 0.25));
+            animation: shimmerGold 6s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
+            cursor: default;
+            user-select: none;
+        }
+        /* Дубликат заголовка для эффекта outline / прозрачной обводки */
+        .gradient-heading-outline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-family: var(--font-display);
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: transparent;
+            -webkit-text-stroke: 1.5px rgba(226, 176, 74, 0.25);
+            text-stroke: 1.5px rgba(226, 176, 74, 0.25);
+            z-index: 1;
+            pointer-events: none;
+            user-select: none;
+        }
+        @keyframes shimmerGold {
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 16px auto 0;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+        .hero-subtitle strong {
+            color: var(--accent-gold-light);
+            font-weight: 600;
+        }
+
+        /* ========== SKILLS CARDS ========== */
+        .section-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(1.6rem, 3vw, 2.2rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 36px;
+            letter-spacing: -0.01em;
+        }
+        .section-title .accent {
+            color: var(--accent-gold);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 50px;
+        }
+        .skill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-lg);
+            padding: 28px 22px 22px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: var(--shadow-card);
+        }
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-cyan));
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+        }
+        .skill-card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.14);
+            box-shadow: var(--shadow-card-hover);
+            transform: translateY(-6px);
+        }
+        .skill-card:hover::before {
+            opacity: 1;
+        }
+        .skill-card:nth-child(2):before {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-rose), var(--accent-orange));
+        }
+        .skill-card:nth-child(3):before {
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green), var(--accent-blue));
+        }
+        .skill-card:nth-child(4):before {
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-gold), var(--accent-rose));
+        }
+        .skill-icon {
+            font-size: 2.2rem;
+            transition: transform var(--transition-bounce);
+            display: inline-block;
+        }
+        .skill-card:hover .skill-icon {
+            transform: scale(1.15) rotate(-5deg);
+        }
+        .skill-card h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .skill-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .skill-card .skill-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--accent-gold-light);
+            font-weight: 500;
+            margin-top: auto;
+        }
+        .skill-level-dots {
+            display: flex;
+            gap: 3px;
+        }
+        .skill-level-dots span {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: var(--transition-fast);
+        }
+        .skill-level-dots span.filled {
+            background: var(--accent-gold);
+            box-shadow: 0 0 6px rgba(226, 176, 74, 0.5);
+        }
+        .skill-card:hover .skill-level-dots span.filled {
+            box-shadow: 0 0 10px rgba(226, 176, 74, 0.8);
+        }
+
+        /* ========== CASE BLOCKS ========== */
+        .cases-section {
+            margin-bottom: 50px;
+        }
+        .case-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: var(--radius-xl);
+            padding: 32px 30px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+            transition: var(--transition-smooth);
+            border-left: 4px solid transparent;
+        }
+        .case-block:hover {
+            box-shadow: var(--shadow-card-hover);
+            border-left-color: var(--accent-gold);
+            background: var(--bg-card-hover);
+        }
+        .case-block::after {
+            content: '';
+            position: absolute;
+            right: -30px;
+            top: -30px;
+            width: 140px;
+            height: 140px;
+            background: radial-gradient(circle, rgba(226, 176, 74, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .case-number {
+            font-family: var(--font-mono);
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.03);
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            pointer-events: none;
+            user-select: none;
+            line-height: 1;
+        }
+        .case-block h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+        .case-block .case-meta {
+            font-size: 0.8rem;
+            color: var(--accent-gold-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        .case-block p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        .case-highlight {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(226, 176, 74, 0.1);
+            border: 1px solid rgba(226, 176, 74, 0.25);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--accent-gold-light);
+            margin-top: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== TOOLS TAGS ========== */
+        .tools-section {
+            margin-bottom: 50px;
+        }
+        .tags-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .tag {
+            display: inline-block;
+            padding: 10px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .tag::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(91, 127, 255, 0.15), rgba(139, 92, 246, 0.1));
+            opacity: 0;
+            transition: opacity var(--transition-smooth);
+            border-radius: 50px;
+        }
+        .tag:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+        .tag:hover::before {
+            opacity: 1;
+        }
+        .tag.accent-tag {
+            background: rgba(226, 176, 74, 0.1);
+            border-color: rgba(226, 176, 74, 0.3);
+            color: var(--accent-gold-light);
+            font-weight: 600;
+        }
+        .tag.accent-tag:hover {
+            background: rgba(226, 176, 74, 0.18);
+            border-color: rgba(226, 176, 74, 0.5);
+            box-shadow: 0 6px 24px rgba(226, 176, 74, 0.2);
+            color: #fff;
+        }
+
+        /* ========== FOOTER NOTE ========== */
+        .footer-note {
+            text-align: center;
+            padding: 40px 0 50px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-subtle);
+            margin-top: 20px;
+        }
+        .footer-note .pulse-icon {
+            display: inline-block;
+            animation: pulse-dot 2s ease-in-out infinite;
+            color: var(--accent-gold);
+        }
+
+        /* ========== АДАПТИВНОСТЬ ========== */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 0 10px;
+            }
+            .gradient-heading,
+            .gradient-heading-outline {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+            .hero-subtitle {
+                font-size: 1rem;
+                padding: 0 8px;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+            .skill-card {
+                padding: 20px 16px 18px;
+            }
+            .skill-card h3 {
+                font-size: 0.95rem;
+            }
+            .skill-card p {
+                font-size: 0.8rem;
+            }
+            .case-block {
+                padding: 24px 18px;
+                border-radius: var(--radius-md);
+            }
+            .case-number {
+                font-size: 2.5rem;
+                right: 10px;
+                top: 5px;
+            }
+            .case-block h3 {
+                font-size: 1.1rem;
+            }
+            .tags-cloud {
+                gap: 8px;
+            }
+            .tag {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+            .section-title {
+                font-size: 1.4rem;
+                margin-bottom: 24px;
+            }
+        }
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 14px;
+            }
+            .skills-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .hero-badge {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+            .gradient-heading,
+            .gradient-heading-outline {
+                font-size: clamp(1.7rem, 9vw, 2.4rem);
+            }
+            .case-block {
+                padding: 18px 14px;
+            }
+            .case-number {
+                font-size: 2rem;
+            }
+            .tag {
+                padding: 7px 12px;
+                font-size: 0.75rem;
+            }
+            .hero {
+                padding: 28px 0 8px;
+            }
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+
+        <!-- ==================== HERO / ЗАГОЛОВОК ==================== -->
+        <section class="hero">
+            <span class="hero-badge">
+                <span class="dot"></span> Кейс из портфолио
+            </span>
+            <div class="gradient-heading-wrapper">
+                <h1 class="gradient-heading">Дашборд с основными<br>финансовыми метриками</h1>
+                <span class="gradient-heading-outline" aria-hidden="true">Дашборд с основными<br>финансовыми метриками</span>
+            </div>
+            <p class="hero-subtitle">
+                Интерактивная аналитическая панель для мониторинга <strong>ключевых показателей</strong> бизнеса:
+                выручка, прибыль, рентабельность и денежный поток — в режиме реального времени.
+            </p>
+        </section>
+
+        <!-- ==================== КАРТОЧКИ НАВЫКОВ ==================== -->
+        <section>
+            <p class="section-label">Ключевые компетенции</p>
+            <h2 class="section-title">Что было <span class="accent">реализовано</span> в проекте</h2>
+            <div class="skills-grid">
+                <!-- Карточка 1 -->
+                <div class="skill-card" tabindex="0" role="button" aria-label="Финансовое моделирование">
+                    <span class="skill-icon">📊</span>
+                    <h3>Финансовое моделирование</h3>
+                    <p>Расчёт маржинальности, EBITDA, операционной прибыли и других производных метрик.</p>
+                    <span class="skill-level">
+                        Уровень
+                        <span class="skill-level-dots">
+                            <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span>
+                        </span>
+                    </span>
+                </div>
+                <!-- Карточка 2 -->
+                <div class="skill-card" tabindex="0" role="button" aria-label="Визуализация данных">
+                    <span class="skill-icon">🎨</span>
+                    <h3>Визуализация данных</h3>
+                    <p>Динамические графики, спарклайны и heatmap-карты для быстрого считывания трендов.</p>
+                    <span class="skill-level">
+                        Уровень
+                        <span class="skill-level-dots">
+                            <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span>
+                        </span>
+                    </span>
+                </div>
+                <!-- Карточка 3 -->
+                <div class="skill-card" tabindex="0" role="button" aria-label="Интерактивные фильтры">
+                    <span class="skill-icon">🔍</span>
+                    <h3>Интерактивные фильтры</h3>
+                    <p>Кросс-фильтрация по периодам, продуктам и регионам с мгновенной реакцией дашборда.</p>
+                    <span class="skill-level">
+                        Уровень
+                        <span class="skill-level-dots">
+                            <span class="filled"></span><span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span>
+                        </span>
+                    </span>
+                </div>
+                <!-- Карточка 4 -->
+                <div class="skill-card" tabindex="0" role="button" aria-label="Автоматизация отчётности">
+                    <span class="skill-icon">⚡</span>
+                    <h3>Автоматизация отчётности</h3>
+                    <p>Настроен ETL-пайплайн: данные подгружаются автоматически, без ручного вмешательства.</p>
+                    <span class="skill-level">
+                        Уровень
+                        <span class="skill-level-dots">
+                            <span class="filled"></span><span class="filled"></span><span class="filled"></span><span></span><span></span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== КЕЙСЫ / ПРИМЕРЫ ==================== -->
+        <section class="cases-section">
+            <p class="section-label">Примеры реализации</p>
+            <h2 class="section-title">Фрагменты <span class="accent">дашборда</span></h2>
+
+            <!-- Кейс 1 -->
+            <div class="case-block">
+                <span class="case-number">01</span>
+                <h3>Сводная панель KPI</h3>
+                <span class="case-meta">⚡ Высокая производительность</span>
+                <p>
+                    На главном экране размещены карточки с итоговыми значениями:
+                    <strong>выручка, чистая прибыль, ROMI и средний чек</strong>.
+                    Каждая карточка имеет цветовую индикацию отклонения от плана
+                    и микро-график динамики за последние 30 дней.
+                </p>
+                <span class="case-highlight">📈 Рост конверсии просмотра на 40%</span>
+            </div>
+
+            <!-- Кейс 2 -->
+            <div class="case-block">
+                <span class="case-number">02</span>
+                <h3>Анализ денежного потока</h3>
+                <span class="case-meta">💧 Cash Flow</span>
+                <p>
+                    Водопадная диаграмма (waterfall chart) отображает поступления,
+                    списания и итоговый остаток. Реализована возможность
+                    <strong>drill-down</strong> до отдельных транзакций.
+                </p>
+                <span class="case-highlight">🕐 Экономия 5 часов в неделю на отчётности</span>
+            </div>
+
+            <!-- Кейс 3 -->
+            <div class="case-block">
+                <span class="case-number">03</span>
+                <h3>План-факт анализ</h3>
+                <span class="case-meta">🎯 Точность прогнозирования</span>
+                <p>
+                    Сравнение фактических показателей с плановыми в разрезе
+                    месяцев и подразделений. Отклонения подсвечиваются
+                    <strong>градиентной шкалой</strong> от зелёного к красному.
+                </p>
+                <span class="case-highlight">✅ Точность прогноза повышена на 25%</span>
+            </div>
+        </section>
+
+        <!-- ==================== ТЕГИ ИНСТРУМЕНТОВ ==================== -->
+        <section class="tools-section">
+            <p class="section-label">Технологический стек</p>
+            <h2 class="section-title">Инструменты и <span class="accent">технологии</span></h2>
+            <div class="tags-cloud">
+                <span class="tag accent-tag">Power BI</span>
+                <span class="tag">Tableau</span>
+                <span class="tag accent-tag">SQL / PostgreSQL</span>
+                <span class="tag">Python (Pandas)</span>
+                <span class="tag">Excel (Power Query)</span>
+                <span class="tag accent-tag">DAX</span>
+                <span class="tag">Google Looker Studio</span>
+                <span class="tag">REST API</span>
+                <span class="tag accent-tag">ETL-пайплайны</span>
+                <span class="tag">Figma (дизайн)</span>
+                <span class="tag">Git</span>
+                <span class="tag accent-tag">Metabase</span>
+            </div>
+        </section>
+
+        <!-- ==================== FOOTER ==================== -->
+        <div class="footer-note">
+            <span class="pulse-icon">●</span> Проект выполнен с фокусом на UX-дизайн аналитических интерфейсов
+            &nbsp;|&nbsp; Адаптивная вёрстка дашборда под любые устройства
+        </div>
+
+    </main>
+</body>
+</html>
